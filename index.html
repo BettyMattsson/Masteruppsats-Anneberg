@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anneberg - Viktning av dimensioner</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #1a3e6f;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #1a3e6f;
+            padding-bottom: 10px;
+        }
+        
+        .context-box-orange {
+            background-color: #fff3e0;
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .dimension-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 2px solid;
+            display: block;
+        }
+        
+        .dimensions-weighting { border-color: #1a3e6f; }
+        
+        .dimension-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+            color: #1a3e6f;
+            border-color: #1a3e6f;
+        }
+        
+        .description-box {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #1a3e6f;
+        }
+        
+        .dimension-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .dimension-info {
+            flex: 2;
+            min-width: 200px;
+        }
+        
+        .dimension-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a3e6f;
+        }
+        
+        .dimension-desc {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .slider-container {
+            flex: 2;
+            min-width: 150px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1a3e6f;
+            cursor: pointer;
+        }
+        
+        .input-container {
+            flex: 0.8;
+            min-width: 80px;
+        }
+        
+        .point-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        .value-box {
+            flex: 0.5;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #1a3e6f;
+            min-width: 60px;
+            background-color: #f0f4ff;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .total-section {
+            background-color: #f1f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px dashed #1a3e6f;
+        }
+        
+        .total-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .points-remaining {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        
+        .chart-container {
+            max-width: 400px;
+            margin: 30px auto;
+        }
+        
+        .stakeholder-section {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+        
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .primary-btn {
+            background-color: #1a3e6f;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .secondary-btn {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="margin-bottom: 5px; color: #1a3e6f;">Framtidens dagvatten i Anneberg: Din röst är viktig!</h1>
+        <p style="font-style: italic; color: #7f8c8d; margin-top: 0; font-size: 1.1rem;">
+            En masterstudie från Chalmers om lokal dagvattenhantering
+        </p>
+
+        <div class="context-box-orange">
+            <h3>📝 Din uppgift</h3>
+            <p>Fördela <strong>100 poäng mellan de fyra dimensionerna</strong> baserat på vad du tycker är viktigast.</p>
+            <p><strong>Fler poäng = högre viktighet</strong></p>
+            <p style="margin-top: 10px;">Dina tidigare viktningar av kriterier inom varje dimension har redan gjorts. Nu är det dags att avgöra hur mycket varje dimension ska väga i den slutgiltiga bedömningen.</p>
+        </div>
+
+        <!-- DIMENSION WEIGHTING -->
+        <div class="dimension-card dimensions-weighting">
+            <div class="dimension-header">⚖️ Slutgiltig viktning – Vilken dimension är viktigast?</div>
+            
+            <div class="description-box">
+                <strong>📋 Varför denna viktning?</strong>
+                <p style="margin-top: 10px;">Genom att ge en dimension en hög vikt, kommer dina tidigare val inom den dimensionen att få en större påverkan på slutresultatet. Om en dimension tilldelas noll poäng kommer dina tidigare poäng för den kategorin inte att återspeglas i det slutliga resultatet.</p>
+            </div>
+            
+            <div id="dimensions-sliders-container"></div>
+            
+            <div class="total-section">
+                <div class="total-display" id="dimensionsTotal">0</div>
+                <div class="points-remaining" id="dimensionsRemaining"></div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="dimensionsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- STAKEHOLDER INFO -->
+        <div class="stakeholder-section" id="stakeholder-section" style="display: none;">
+            <h3>Om dig</h3>
+            
+            <select id="stakeholderRole" required>
+                <option value="" disabled selected>Välj din roll...</option>
+                <option value="resident">Boende i eller runt Anneberg</option>
+                <option value="business">Konsult</option>
+                <option value="environmental">Miljöorganisation</option>
+                <option value="municipality">Kommun</option>
+                <option value="researcher">Forskare / Expert</option>
+                <option value="Property owner">Fastighetsbolag</option>
+                <option value="other">Övrigt</option>
+            </select>
+            
+            <div style="margin-top: 20px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Har du tidigare kunskap om dagvatten?</label>
+                <div style="display: flex; gap: 20px;">
+                    <label><input type="radio" name="stormwaterKnowledge" value="yes"> Ja</label>
+                    <label><input type="radio" name="stormwaterKnowledge" value="no"> Nej</label>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Har du tidigare kunskap om området Anneberg?</label>
+                <div style="display: flex; gap: 20px;">
+                    <label><input type="radio" name="annebergKnowledge" value="yes"> Ja</label>
+                    <label><input type="radio" name="annebergKnowledge" value="no"> Nej</label>
+                </div>
+            </div>
+            
+            <textarea id="comments" rows="5" placeholder="Har du några reflektioner kring din viktning? (valfritt)" style="margin-top: 20px;"></textarea>
+            
+            <div class="button-group">
+                <button class="secondary-btn" id="backFromSubmitBtn" style="display: none;">◀ Bakåt</button>
+                <button class="primary-btn" id="submitBtn">Skicka in min viktning</button>
+            </div>
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 1. DIMENSION DEFINITIONS MED FÖRKLARINGAR
+        // ============================================
+        const dimensions = [
+            { 
+                id: "environmental", 
+                name: "🌿 Miljö", 
+                color: "#27ae60",
+                description: "Handlar om åtgärdernas påverkan på den naturliga miljön – att rena dagvatten från föroreningar (t.ex. näringsämnen, metaller) och att främja biologisk mångfald (habitat för växter och djur)."
+            },
+            { 
+                id: "social", 
+                name: "👥 Socialt", 
+                color: "#e67e22",
+                description: "Handlar om hur åtgärderna påverkar människors livskvalitet, rekreation och estetiska värden, samt pedagogiska värden för skolor i närheten."
+            },
+            { 
+                id: "economic", 
+                name: "💰 Ekonomi", 
+                color: "#3498db",
+                description: "Handlar om kostnader – låg anläggningskostnad (engångskostnad vid byggnation) kontra låg årlig underhållskostnad (löpande kostnader över tid)."
+            },
+            { 
+                id: "technical", 
+                name: "⚙️ Teknik", 
+                color: "#9b59b6",
+                description: "Handlar om underhåll – låg underhållsfrekvens (hur ofta underhåll behövs) kontra låg underhållskomplexitet (hur enkelt underhållet är att genomföra)."
+            }
+        ];
+        
+        // ============================================
+        // 2. STATE FOR VALUES
+        // ============================================
+        let values = {
+            dimensions: [0, 0, 0, 0]
+        };
+        
+        let charts = {
+            dimensions: null
+        };
+        
+        // ============================================
+        // 3. DIMENSION SLIDERS WITH DESCRIPTIONS
+        // ============================================
+        function createDimensionSliders() {
+            const container = document.getElementById('dimensions-sliders-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            dimensions.forEach((dim, index) => {
+                const row = document.createElement('div');
+                row.className = 'dimension-row';
+                row.style.borderLeft = `5px solid ${dim.color}`;
+                row.style.paddingLeft = '15px';
+                
+                row.innerHTML = `
+                    <div class="dimension-info">
+                        <div class="dimension-name" style="color: ${dim.color};">${dim.name}</div>
+                        <div class="dimension-desc">${dim.description}</div>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="dimensions-slider-${index}" min="0" max="100" value="0" style="width: 100%;">
+                    </div>
+                    <div class="input-container">
+                        <input type="number" class="point-input" id="dimensions-input-${index}" min="0" max="100" value="0" style="width: 100%;">
+                    </div>
+                    <div class="value-box" id="dimensions-value-${index}" style="color: ${dim.color};">0</div>
+                `;
+                
+                container.appendChild(row);
+                
+                const slider = document.getElementById(`dimensions-slider-${index}`);
+                const input = document.getElementById(`dimensions-input-${index}`);
+                const valueDiv = document.getElementById(`dimensions-value-${index}`);
+                
+                const updateValue = (val) => {
+                    values.dimensions[index] = val;
+                    slider.value = val;
+                    input.value = val;
+                    valueDiv.textContent = val;
+                    updateTotal();
+                    updateChart();
+                };
+                
+                slider.addEventListener('input', (e) => updateValue(parseInt(e.target.value) || 0));
+                input.addEventListener('input', (e) => {
+                    let val = parseInt(e.target.value);
+                    if (isNaN(val)) val = 0;
+                    if (val < 0) val = 0;
+                    if (val > 100) val = 100;
+                    updateValue(val);
+                });
+            });
+        }
+        
+        // ============================================
+        // 4. UPDATE TOTAL
+        // ============================================
+        function updateTotal() {
+            const sum = values.dimensions.reduce((a, b) => a + b, 0);
+            const totalEl = document.getElementById('dimensionsTotal');
+            const remainingEl = document.getElementById('dimensionsRemaining');
+            
+            if (totalEl) {
+                totalEl.textContent = sum;
+                totalEl.style.color = sum === 100 ? '#27ae60' : '#e74c3c';
+            }
+            
+            if (remainingEl) {
+                const remaining = 100 - sum;
+                if (remaining > 0) {
+                    remainingEl.innerHTML = `📊 <strong>${remaining} poäng kvar</strong> att fördela`;
+                    remainingEl.style.color = '#e67e22';
+                } else if (remaining < 0) {
+                    remainingEl.innerHTML = `⚠️ <strong>${Math.abs(remaining)} poäng för mycket</strong>`;
+                    remainingEl.style.color = '#e74c3c';
+                } else {
+                    remainingEl.innerHTML = '✅ <strong>Perfekt! 100 poäng fördelat</strong>';
+                    remainingEl.style.color = '#27ae60';
+                }
+            }
+            
+            // Aktivera submit-knappen om summan är 100 och roll är vald
+            checkIfSubmitReady();
+        }
+        
+        // ============================================
+        // 5. UPDATE CHART (Only dimensions, not criteria)
+        // ============================================
+        function updateChart() {
+            const canvas = document.getElementById('dimensionsChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const valuesArray = values.dimensions;
+            
+            // Only show dimensions with values > 0
+            const nonZeroValues = [];
+            const nonZeroLabels = [];
+            const nonZeroColors = [];
+            
+            valuesArray.forEach((val, idx) => {
+                if (val > 0) {
+                    nonZeroValues.push(val);
+                    nonZeroLabels.push(dimensions[idx].name);
+                    nonZeroColors.push(dimensions[idx].color);
+                }
+            });
+            
+            if (nonZeroValues.length === 0) {
+                if (charts.dimensions) charts.dimensions.destroy();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#999';
+                ctx.fillText('Fördela poäng för att se diagrammet', 50, 150);
+                return;
+            }
+            
+            if (charts.dimensions) charts.dimensions.destroy();
+            
+            charts.dimensions = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: nonZeroLabels,
+                    datasets: [{
+                        data: nonZeroValues,
+                        backgroundColor: nonZeroColors,
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percent = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} poäng (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // ============================================
+        // 6. CHECK IF SUBMIT READY
+        // ============================================
+        function checkIfSubmitReady() {
+            const roleSelected = document.getElementById('stakeholderRole').value;
+            const dimensionsDone = values.dimensions.reduce((a, b) => a + b, 0) === 100;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (submitBtn) {
+                submitBtn.disabled = !(roleSelected && dimensionsDone);
+            }
+        }
+        
+        // ============================================
+        // 7. INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            createDimensionSliders();
+            updateTotal();
+            updateChart();
+        });
+        
+        // ============================================
+        // 8. SHOW STAKEHOLDER SECTION
+        // ============================================
+        // När användaren har fördelat 100 poäng, visa "Om dig"-sektionen
+        // Vi använder en observer eller så kollar vi vid varje uppdatering
+        // För enkelhetens skull: visa sektionen när användaren klickar på en knapp eller automatiskt när summan är 100
+        
+        // Funktion för att visa stakeholder-sektionen
+        function showStakeholderSection() {
+            const sum = values.dimensions.reduce((a, b) => a + b, 0);
+            if (sum === 100) {
+                document.querySelector('.dimension-card').style.display = 'none';
+                document.getElementById('stakeholder-section').style.display = 'block';
+            } else {
+                alert('Vänligen fördela alla 100 poäng innan du går vidare!');
+            }
+        }
+        
+        // Lägg till en knapp för att gå vidare
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Gå vidare →';
+        nextBtn.style.backgroundColor = '#1a3e6f';
+        nextBtn.style.color = 'white';
+        nextBtn.style.border = 'none';
+        nextBtn.style.padding = '15px 40px';
+        nextBtn.style.fontSize = '1.2rem';
+        nextBtn.style.borderRadius = '50px';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.style.fontWeight = 'bold';
+        nextBtn.style.display = 'block';
+        nextBtn.style.margin = '30px auto';
+        nextBtn.style.width = 'fit-content';
+        
+        nextBtn.addEventListener('click', showStakeholderSection);
+        
+        // Lägg till knappen efter total-sektionen
+        const totalSection = document.querySelector('.total-section');
+        if (totalSection) {
+            totalSection.insertAdjacentElement('afterend', nextBtn);
+        }
+        
+        // ============================================
+        // 9. SUBMIT
+        // ============================================
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const role = document.getElementById('stakeholderRole').value;
+            if (!role) {
+                alert('Vänligen välj din roll!');
+                return;
+            }
+            
+            const stormwaterKnowledge = document.querySelector('input[name="stormwaterKnowledge"]:checked');
+            const annebergKnowledge = document.querySelector('input[name="annebergKnowledge"]:checked');
+            
+            this.disabled = true;
+            this.textContent = 'Skickar...';
+            
+            const formData = new FormData();
+            formData.append('timestamp', new Date().toLocaleString('sv-SE'));
+            formData.append('role', role);
+            formData.append('stormwaterKnowledge', stormwaterKnowledge ? stormwaterKnowledge.value : '');
+            formData.append('annebergKnowledge', annebergKnowledge ? annebergKnowledge.value : '');
+            formData.append('comments', document.getElementById('comments').value || '');
+            formData.append('dimension_environmental', values.dimensions[0]);
+            formData.append('dimension_social', values.dimensions[1]);
+            formData.append('dimension_economic', values.dimensions[2]);
+            formData.append('dimension_technical', values.dimensions[3]);
+            
+            const scriptURL = 'https://script.google.com/macros/s/DIN_APPS_SCRIPT_URL_HÄR/exec';
+            
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+                
+                document.getElementById('statusMessage').className = 'status-message status-success';
+                document.getElementById('statusMessage').innerHTML = '✅ Tack för ditt svar! Din viktning har sparats.';
+                document.getElementById('statusMessage').style.display = 'block';
+                this.disabled = true;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('statusMessage').className = 'status-message status-error';
+                document.getElementById('statusMessage').innerHTML = '❌ Ett fel uppstod: ' + error.message;
+                document.getElementById('statusMessage').style.display = 'block';
+                this.disabled = false;
+                this.textContent = 'Skicka in min viktning';
+            }
+        });
+        
+        // EVENT LISTENERS FOR SUBMIT BUTTON
+        document.getElementById('stakeholderRole').addEventListener('change', checkIfSubmitReady);
+        
+        function addDimensionListeners() {
+            for (let i = 0; i < 4; i++) {
+                const slider = document.getElementById(`dimensions-slider-${i}`);
+                const input = document.getElementById(`dimensions-input-${i}`);
+                if (slider) slider.addEventListener('input', checkIfSubmitReady);
+                if (input) input.addEventListener('input', checkIfSubmitReady);
+            }
+        }
+        setTimeout(addDimensionListeners, 500);
+    </script>
+</body>
+</html>
