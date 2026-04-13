@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anneberg - Viktning av dimensioner</title>
+    <title>Masteruppsats - viktning av dimensioner</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -257,16 +257,17 @@
             <h3>📝 Din uppgift</h3>
             <p>Fördela <strong>100 poäng mellan de fyra dimensionerna</strong> baserat på vad du tycker är viktigast.</p>
             <p><strong>Fler poäng = högre viktighet</strong></p>
-            <p style="margin-top: 10px;">Dina tidigare viktningar av kriterier inom varje dimension har redan gjorts. Nu är det dags att avgöra hur mycket varje dimension ska väga i den slutgiltiga bedömningen.</p>
         </div>
 
         <!-- DIMENSION WEIGHTING -->
         <div class="dimension-card dimensions-weighting">
-            <div class="dimension-header">⚖️ Slutgiltig viktning – Vilken dimension är viktigast?</div>
+            <div class="dimension-header">⚖️ Vilken dimension är viktigast?</div>
             
             <div class="description-box">
                 <strong>📋 Varför denna viktning?</strong>
-                <p style="margin-top: 10px;">Genom att ge en dimension en hög vikt, kommer dina tidigare val inom den dimensionen att få en större påverkan på slutresultatet. Om en dimension tilldelas noll poäng kommer dina tidigare poäng för den kategorin inte att återspeglas i det slutliga resultatet.</p>
+                <p style="margin-top: 10px;"> Vi vill veta vad du anser vara viktigt vid val av dagvattenlösningar. 
+                    Genom att tilldela en dimension <strong>fler poäng</strong> anser du att dimension bör ha <strong>större betydelse</strong> vid val av lösning. Om en dimension tilldelas noll poäng anser du att den dimensionen är obetydlig vid val av lösning.</p>
+                <p style="margin-top: 10px;"> Till exempel, om du tycker att det är viktigare med sociala mervärden än att kostnaden hålls låg ger gu mer poäng till "Socialt" än till "Ekonomi".</p>
             </div>
             
             <div id="dimensions-sliders-container"></div>
@@ -331,25 +332,25 @@
                 id: "environmental", 
                 name: "🌿 Miljö", 
                 color: "#27ae60",
-                description: "Handlar om åtgärdernas påverkan på den naturliga miljön – att rena dagvatten från föroreningar (t.ex. näringsämnen, metaller) och att främja biologisk mångfald (habitat för växter och djur)."
+                description: "Handlar om dagvattenlösningarnas påverkan på den naturliga miljön. Inkluderar att främja biologisk mångfald (habitat för växter och djur) och minska påverkan från dagvatten på mottagande vattendrag."
             },
             { 
                 id: "social", 
                 name: "👥 Socialt", 
                 color: "#e67e22",
-                description: "Handlar om hur åtgärderna påverkar människors livskvalitet, rekreation och estetiska värden, samt pedagogiska värden för skolor i närheten."
+                description: "Handlar om hur åtgärderna påverkar människors livskvalitet genom rekreation och estetiska värden, samt pedagogiska värden för skolor i närheten."
             },
             { 
                 id: "economic", 
                 name: "💰 Ekonomi", 
                 color: "#3498db",
-                description: "Handlar om kostnader – låg anläggningskostnad (engångskostnad vid byggnation) kontra låg årlig underhållskostnad (löpande kostnader över tid)."
+                description: "Handlar om kostnader, både anläggningskostnader och fortgående underhållskostnader. Fler poäng betyder att du anser att det är viktigt att kostaden hålls låg."
             },
             { 
                 id: "technical", 
                 name: "⚙️ Teknik", 
                 color: "#9b59b6",
-                description: "Handlar om underhåll – låg underhållsfrekvens (hur ofta underhåll behövs) kontra låg underhållskomplexitet (hur enkelt underhållet är att genomföra)."
+                description: "Handlar om underhåll, både frekvens och komplexitet. Fler poäng betyder att du anser att det är viktigt att underhåll görs mer sällan och inte är lika komplicerat."
             }
         ];
         
